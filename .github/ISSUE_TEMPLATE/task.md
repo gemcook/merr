@@ -1,12 +1,12 @@
 ---
-name: タスク
-about: 対応するタスクの概要を記すテンプレート
+name: Task
+about: A template that outlines the corresponding task.
 title: ''
 labels: ''
 assignees: ''
 
 ---
 
-## 概要
+## :running:Overview
 
-## 備考
+## :book: Note

@@ -1,6 +1,7 @@
 package errs
 
 import (
+	"errors"
 	"sync"
 )
 
@@ -15,6 +16,7 @@ var formatter = func(e *errs) string {
 type Errs interface {
 	Append(err error)
 	Error() string
+	Is(target error) bool
 }
 
 type errs struct {
@@ -40,4 +42,13 @@ func (e *errs) Append(err error) {
 		e.Errors = make([]error, 0)
 	}
 	e.Errors = append(e.Errors, err)
+}
+
+func (e *errs) Is(target error) bool {
+	for _, err := range e.Errors {
+		if errors.Is(err, target) {
+			return true
+		}
+	}
+	return false
 }

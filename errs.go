@@ -17,6 +17,7 @@ type Errs interface {
 	Append(err error)
 	Error() string
 	Is(target error) bool
+	As(target interface{}) bool
 }
 
 type errs struct {
@@ -47,6 +48,15 @@ func (e *errs) Append(err error) {
 func (e *errs) Is(target error) bool {
 	for _, err := range e.Errors {
 		if errors.Is(err, target) {
+			return true
+		}
+	}
+	return false
+}
+
+func (e *errs) As(target interface{}) bool {
+	for _, err := range e.Errors {
+		if errors.As(err, target) {
 			return true
 		}
 	}

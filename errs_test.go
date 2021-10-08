@@ -1,6 +1,7 @@
 package errs
 
 import (
+	"errors"
 	"fmt"
 	"sync"
 	"testing"
@@ -95,3 +96,60 @@ func Test_errs_Is(t *testing.T) {
 		})
 	}
 }
+
+func Test_errs_As(t *testing.T) {
+	serr := &somethingError{}
+
+	tests := []struct {
+		name string
+		arg  interface{}
+		errs Errs
+		want bool
+	}{
+		{
+			"match/contain",
+			&serr,
+			&errs{
+				mx: sync.Mutex{},
+				Errors: []error{
+					&somethingError{},
+					errors.New("err"),
+				},
+			},
+			true,
+		},
+		{
+			"match/wrapped",
+			&serr,
+			&errs{
+				mx: sync.Mutex{},
+				Errors: []error{
+					fmt.Errorf("%w", &somethingError{}),
+				},
+			},
+			true,
+		},
+		{
+			"not match/not contain",
+			&serr,
+			&errs{
+				mx: sync.Mutex{},
+				Errors: []error{
+					errors.New("err"),
+				},
+			},
+			false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			e := tt.errs
+			got := e.As(tt.arg)
+			assert.Equal(t, tt.want, got)
+		})
+	}
+}
+
+type somethingError struct{}
+
+func (s *somethingError) Error() string { return "something error" }

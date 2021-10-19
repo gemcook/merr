@@ -25,6 +25,17 @@ func Test_errs_Error(t *testing.T) {
 			fmt.Errorf("%s", "error"),
 			"error",
 		},
+		{
+			"check/error/multiple",
+			&errs{
+				mx: sync.Mutex{},
+				Errors: []error{
+					fmt.Errorf("%s", "error1"),
+					fmt.Errorf("%s", "error2"),
+				},
+			},
+			"error1,\nerror2",
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -34,6 +45,7 @@ func Test_errs_Error(t *testing.T) {
 			}
 			got := e.Error()
 			assert.Equal(t, tt.want, got)
+			fmt.Print(got)
 		})
 	}
 }

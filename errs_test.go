@@ -1,6 +1,7 @@
 package errs
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"sync"
@@ -153,3 +154,41 @@ func Test_errs_As(t *testing.T) {
 type somethingError struct{}
 
 func (s *somethingError) Error() string { return "something error" }
+
+func Test_errs_PrettyPrint(t *testing.T) {
+	tests := []struct {
+		name string
+		errs Errs
+		out  string
+	}{
+		{
+			"print struct",
+			&errs{
+				mx: sync.Mutex{},
+				Errors: []error{
+					&somethingError{},
+				},
+			},
+			"Errors[\n  &errs.somethingError{},\n]",
+		},
+		{
+			"print nil",
+			&errs{
+				mx: sync.Mutex{},
+				Errors: []error{
+					nil,
+				},
+			},
+			"Errors[\n  nil,\n]",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			e := tt.errs
+			buf := bytes.NewBufferString("")
+			SetOutput(buf)
+			e.PrettyPrint()
+			assert.Equal(t, tt.out, buf.String())
+		})
+	}
+}

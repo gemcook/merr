@@ -49,8 +49,6 @@ func Example() {
 	}
 	err.Append(ptrErr)
 
-	errs.SetOutput(os.Stderr)
-	err.PrettyPrint()
 	errs.SetOutput(os.Stdout)
 	err.PrettyPrint()
 

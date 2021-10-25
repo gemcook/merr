@@ -41,7 +41,7 @@ func SetOutput(out io.Writer) {
 	output = out
 }
 
-func ReseetOutput() {
+func ResetOutput() {
 	output = defaultOutput
 }
 

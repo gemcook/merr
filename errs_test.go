@@ -10,7 +10,6 @@ import (
 )
 
 func Test_errs_Error(t *testing.T) {
-
 	tests := []struct {
 		name string
 		arg  error

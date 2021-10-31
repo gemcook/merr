@@ -10,6 +10,7 @@ import (
 )
 
 func Test_errs_Error(t *testing.T) {
+
 	tests := []struct {
 		name string
 		arg  error
@@ -36,6 +37,17 @@ func Test_errs_Error(t *testing.T) {
 			},
 			"error1,\nerror2",
 		},
+		{
+			"check/error/wrapped",
+			&errs{
+				mx: sync.Mutex{},
+				Errors: []error{
+					fmt.Errorf("%w", &somethingError{}),
+					fmt.Errorf("%w", &somethingError{}),
+				},
+			},
+			"something error,\nsomething error",
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -45,7 +57,6 @@ func Test_errs_Error(t *testing.T) {
 			}
 			got := e.Error()
 			assert.Equal(t, tt.want, got)
-			fmt.Print(got)
 		})
 	}
 }

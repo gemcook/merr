@@ -7,8 +7,12 @@ import (
 
 var formatter = func(e *errs) string {
 	var result string
-	for _, e := range e.Errors {
-		result += e.Error()
+	suffix := ",\n"
+	for i, err := range e.Errors {
+		if len(e.Errors)-1 == i {
+			suffix = ""
+		}
+		result += err.Error() + suffix
 	}
 	return result
 }

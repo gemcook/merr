@@ -1,4 +1,10 @@
 {
+  "labels": [
+    "renovate"
+  ],
+  "postUpdateOptions": [
+    "gomodTidy"
+  ],
   "extends": [
     "config:base"
   ]

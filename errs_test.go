@@ -1,4 +1,4 @@
-package errs
+package merr
 
 import (
 	"bytes"
@@ -191,7 +191,7 @@ func Test_errs_PrettyPrint(t *testing.T) {
 					&somethingError{},
 				},
 			},
-			"Errors[\n  &errs.somethingError{},\n]",
+			"Errors[\n  &merr.somethingError{},\n]",
 		},
 		{
 			"print nil",

@@ -1,10 +1,10 @@
-package errs_test
+package merr_test
 
 import (
 	"fmt"
 	"os"
 
-	"github.com/gemcook/errs"
+	"github.com/gemcook/merr"
 )
 
 type structError struct {
@@ -28,7 +28,7 @@ func (*ptrError) Error() string {
 }
 
 func Example() {
-	err := errs.New()
+	err := merr.New()
 
 	// error interface
 	err.Append(fmt.Errorf("%w", fmt.Errorf("wrap error")))
@@ -49,7 +49,7 @@ func Example() {
 	}
 	err.Append(ptrErr)
 
-	errs.SetOutput(os.Stdout)
+	merr.SetOutput(os.Stdout)
 	err.PrettyPrint()
 
 	// output:
@@ -60,12 +60,12 @@ func Example() {
 	//       s: "wrap error",
 	//     },
 	//   },
-	//   errs_test.structError{
+	//   merr_test.structError{
 	//     i:   1,
 	//     str: "error",
 	//     b:   true,
 	//   },
-	//   &errs_test.ptrError{
+	//   &merr_test.ptrError{
 	//     i:   1,
 	//     str: "error",
 	//     b:   true,

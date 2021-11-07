@@ -1,4 +1,4 @@
-module github.com/gemcook/errs
+module github.com/gemcook/merr
 
 go 1.17
 

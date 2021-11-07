@@ -27,7 +27,7 @@ var (
 
 var formatter = func(e *errs) string {
 	var result string
-	suffix := ",\n"
+	suffix := "\n"
 	for i, err := range e.Errors {
 		if len(e.Errors)-1 == i {
 			suffix = ""

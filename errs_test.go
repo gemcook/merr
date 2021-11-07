@@ -35,7 +35,7 @@ func Test_errs_Error(t *testing.T) {
 					fmt.Errorf("%s", "error2"),
 				},
 			},
-			"error1,\nerror2",
+			"error1\nerror2",
 		},
 		{
 			"check/error/wrapped",
@@ -46,7 +46,7 @@ func Test_errs_Error(t *testing.T) {
 					fmt.Errorf("%w", &somethingError{}),
 				},
 			},
-			"something error,\nsomething error",
+			"something error\nsomething error",
 		},
 	}
 	for _, tt := range tests {

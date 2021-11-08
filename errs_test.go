@@ -1,4 +1,4 @@
-package errs
+package merr
 
 import (
 	"bytes"
@@ -35,7 +35,7 @@ func Test_errs_Error(t *testing.T) {
 					fmt.Errorf("%s", "error2"),
 				},
 			},
-			"error1,\nerror2",
+			"error1\nerror2",
 		},
 		{
 			"check/error/wrapped",
@@ -46,7 +46,7 @@ func Test_errs_Error(t *testing.T) {
 					fmt.Errorf("%w", &somethingError{}),
 				},
 			},
-			"something error,\nsomething error",
+			"something error\nsomething error",
 		},
 	}
 	for _, tt := range tests {
@@ -191,7 +191,7 @@ func Test_errs_PrettyPrint(t *testing.T) {
 					&somethingError{},
 				},
 			},
-			"Errors[\n  &errs.somethingError{},\n]",
+			"Errors[\n  &merr.somethingError{},\n]",
 		},
 		{
 			"print nil",

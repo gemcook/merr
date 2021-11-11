@@ -203,6 +203,11 @@ func Test_errs_PrettyPrint(t *testing.T) {
 			},
 			"Errors[\n  nil,\n]",
 		},
+		{
+			"print empty",
+			New(),
+			"Errors[]",
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

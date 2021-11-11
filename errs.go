@@ -18,6 +18,8 @@ const (
 	tabwidth = 0
 	padding  = 1
 	padchar  = " "
+	lf       = "\n"
+	dlm      = ","
 )
 
 var (
@@ -27,7 +29,7 @@ var (
 
 var formatter = func(e *errs) string {
 	var result string
-	suffix := "\n"
+	suffix := lf
 	for i, err := range e.Errors {
 		if len(e.Errors)-1 == i {
 			suffix = ""
@@ -121,13 +123,19 @@ func newPrettyPrinter(depth int) *prettyPrinter {
 
 func (e *errs) prettyFormat() string {
 	p := newPrettyPrinter(0)
-	fmt.Fprint(p.tw, "Errors[\n")
+	fmt.Fprint(p.tw, "Errors[")
+
 	p.depth++
 	for _, err := range e.Errors {
+		fmt.Fprint(p.tw, lf)
 		p.writeValue(reflect.ValueOf(err), true)
-		fmt.Fprint(p.tw, ",\n")
+		fmt.Fprint(p.tw, dlm)
 	}
 	p.depth--
+
+	if len(e.Errors) > 0 {
+		fmt.Fprint(p.tw, lf)
+	}
 	fmt.Fprint(p.tw, "]")
 	p.tw.Flush()
 	return p.buf.String()
@@ -159,7 +167,7 @@ func (p *prettyPrinter) writeValue(val reflect.Value, enableIndent bool) {
 	case reflect.Map:
 		fmt.Fprintf(p.tw, "%s{", val.Type().String())
 		if !val.IsNil() {
-			fmt.Fprint(p.tw, "\n")
+			fmt.Fprint(p.tw, lf)
 			keys := val.MapKeys()
 			p.depth++
 			for i := range keys {
@@ -171,7 +179,8 @@ func (p *prettyPrinter) writeValue(val reflect.Value, enableIndent bool) {
 				mapValuePrinter.tw.Flush()
 
 				fmt.Fprint(p.tw, mapValuePrinter.buf.String())
-				fmt.Fprint(p.tw, ",\n")
+				fmt.Fprint(p.tw, dlm)
+				fmt.Fprint(p.tw, lf)
 			}
 			p.depth--
 		}
@@ -185,7 +194,7 @@ func (p *prettyPrinter) writeValue(val reflect.Value, enableIndent bool) {
 		}
 		fmt.Fprint(p.tw, "{")
 		if val.IsValid() {
-			fmt.Fprint(p.tw, "\n")
+			fmt.Fprint(p.tw, lf)
 			p.depth++
 			for i := 0; i < val.NumField(); i++ {
 				p.indent()
@@ -196,7 +205,8 @@ func (p *prettyPrinter) writeValue(val reflect.Value, enableIndent bool) {
 				structValuePrinter.tw.Flush()
 
 				fmt.Fprint(p.tw, structValuePrinter.buf.String())
-				fmt.Fprint(p.tw, ",\n")
+				fmt.Fprint(p.tw, dlm)
+				fmt.Fprint(p.tw, lf)
 			}
 			p.depth--
 		}
@@ -224,12 +234,13 @@ func (p *prettyPrinter) writeValue(val reflect.Value, enableIndent bool) {
 		}
 		fmt.Fprint(p.tw, "{")
 		if val.IsValid() {
-			fmt.Fprint(p.tw, "\n")
+			fmt.Fprint(p.tw, lf)
 			p.depth++
 			for i := 0; i < val.Len(); i++ {
 				p.indent()
 				p.writeValue(val.Index(i), false)
-				fmt.Fprint(p.tw, ",\n")
+				fmt.Fprint(p.tw, dlm)
+				fmt.Fprint(p.tw, lf)
 			}
 			p.depth--
 		}

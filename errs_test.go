@@ -219,3 +219,50 @@ func Test_errs_PrettyPrint(t *testing.T) {
 		})
 	}
 }
+
+func TestSetNewLine(t *testing.T) {
+	type args struct {
+		n string
+	}
+	tests := []struct {
+		name string
+		args args
+		want string
+	}{
+		{
+			`set \n`,
+			args{n: "\n"},
+			"Errors[\n  &errors.errorString{\n    s: \"foo\",\n  },\n]",
+		},
+		{
+			`set \r\n`,
+			args{n: "\r\n"},
+			"Errors[\r\n  &errors.errorString{\r\n    s: \"foo\",\r\n  },\r\n]",
+		},
+		{
+			`set \r`,
+			args{n: "\r"},
+			"Errors[\r &errors.errorString{\r   s: \"foo\",\r },\r]",
+		},
+		{
+			`set \t but use default(\n)`,
+			args{n: "\t"},
+			"Errors[\n  &errors.errorString{\n    s: \"foo\",\n  },\n]",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			SetNewLine(tt.args.n)
+
+			e := New()
+			err := fmt.Errorf("%s", "foo")
+			e.Append(err)
+
+			buf := bytes.NewBufferString("")
+			SetOutput(buf)
+			e.PrettyPrint()
+
+			assert.Equal(t, tt.want, buf.String())
+		})
+	}
+}

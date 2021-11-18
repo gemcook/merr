@@ -14,18 +14,20 @@ import (
 
 // tabwriter parameter
 const (
-	minWidth  int    = 2
-	tabwidth  int    = 0
-	padding   int    = 1
-	padchar   byte   = ' '
-	delimiter string = ","
+	minWidth int  = 2
+	tabwidth int  = 0
+	padding  int  = 1
+	padchar  byte = ' '
 )
 
 var (
-	defaultOutput  io.Writer = os.Stdout
-	output         io.Writer = defaultOutput
-	defaultNewline string    = "\u000A"
-	newLine        string    = defaultNewline
+	defaultOutput io.Writer = os.Stdout
+	output        io.Writer = defaultOutput
+
+	defaultNewline string = "\u000A"
+	newLine        string = defaultNewline
+
+	delimiter string = ","
 )
 
 var formatter = func(e *errs) string {

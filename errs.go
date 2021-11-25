@@ -14,20 +14,25 @@ import (
 
 // tabwriter parameter
 const (
-	minWidth = 2
-	tabwidth = 0
-	padding  = 1
-	padchar  = " "
+	minWidth int  = 2
+	tabwidth int  = 0
+	padding  int  = 1
+	padchar  byte = ' '
 )
 
 var (
 	defaultOutput io.Writer = os.Stdout
 	output        io.Writer = defaultOutput
+
+	defaultNewline string = "\u000A"
+	newLine        string = defaultNewline
+
+	delimiter string = ","
 )
 
 var formatter = func(e *errs) string {
 	var result string
-	suffix := "\n"
+	suffix := newLine
 	for i, err := range e.Errors {
 		if len(e.Errors)-1 == i {
 			suffix = ""
@@ -47,6 +52,18 @@ func SetOutput(out io.Writer) {
 
 func ResetOutput() {
 	output = defaultOutput
+}
+
+// SetNewLine is a function to set the newline code.
+//
+// Only "\n" , "\r\n" or "\r" are allowed.
+// If they do not apply, the default value ("\n") is used.
+func SetNewLine(n string) {
+	if n == "\u000A" || n == "\u000D\u000A" || n == "\u000D" {
+		newLine = n
+		return
+	}
+	newLine = defaultNewline
 }
 
 type Errs interface {
@@ -115,19 +132,25 @@ func newPrettyPrinter(depth int) *prettyPrinter {
 		buf:   bytes.NewBufferString(""),
 		depth: depth,
 	}
-	p.tw = tabwriter.NewWriter(p.buf, minWidth, tabwidth, padding, ' ', 0)
+	p.tw = tabwriter.NewWriter(p.buf, minWidth, tabwidth, padding, padchar, 0)
 	return p
 }
 
 func (e *errs) prettyFormat() string {
 	p := newPrettyPrinter(0)
-	fmt.Fprint(p.tw, "Errors[\n")
+	fmt.Fprint(p.tw, "Errors[")
+
 	p.depth++
 	for _, err := range e.Errors {
+		fmt.Fprint(p.tw, newLine)
 		p.writeValue(reflect.ValueOf(err), true)
-		fmt.Fprint(p.tw, ",\n")
+		fmt.Fprint(p.tw, delimiter)
 	}
 	p.depth--
+
+	if len(e.Errors) > 0 {
+		fmt.Fprint(p.tw, newLine)
+	}
 	fmt.Fprint(p.tw, "]")
 	p.tw.Flush()
 	return p.buf.String()
@@ -159,7 +182,7 @@ func (p *prettyPrinter) writeValue(val reflect.Value, enableIndent bool) {
 	case reflect.Map:
 		fmt.Fprintf(p.tw, "%s{", val.Type().String())
 		if !val.IsNil() {
-			fmt.Fprint(p.tw, "\n")
+			fmt.Fprint(p.tw, newLine)
 			keys := val.MapKeys()
 			p.depth++
 			for i := range keys {
@@ -171,7 +194,8 @@ func (p *prettyPrinter) writeValue(val reflect.Value, enableIndent bool) {
 				mapValuePrinter.tw.Flush()
 
 				fmt.Fprint(p.tw, mapValuePrinter.buf.String())
-				fmt.Fprint(p.tw, ",\n")
+				fmt.Fprint(p.tw, delimiter)
+				fmt.Fprint(p.tw, newLine)
 			}
 			p.depth--
 		}
@@ -185,7 +209,7 @@ func (p *prettyPrinter) writeValue(val reflect.Value, enableIndent bool) {
 		}
 		fmt.Fprint(p.tw, "{")
 		if val.IsValid() {
-			fmt.Fprint(p.tw, "\n")
+			fmt.Fprint(p.tw, newLine)
 			p.depth++
 			for i := 0; i < val.NumField(); i++ {
 				p.indent()
@@ -196,7 +220,8 @@ func (p *prettyPrinter) writeValue(val reflect.Value, enableIndent bool) {
 				structValuePrinter.tw.Flush()
 
 				fmt.Fprint(p.tw, structValuePrinter.buf.String())
-				fmt.Fprint(p.tw, ",\n")
+				fmt.Fprint(p.tw, delimiter)
+				fmt.Fprint(p.tw, newLine)
 			}
 			p.depth--
 		}
@@ -224,12 +249,13 @@ func (p *prettyPrinter) writeValue(val reflect.Value, enableIndent bool) {
 		}
 		fmt.Fprint(p.tw, "{")
 		if val.IsValid() {
-			fmt.Fprint(p.tw, "\n")
+			fmt.Fprint(p.tw, newLine)
 			p.depth++
 			for i := 0; i < val.Len(); i++ {
 				p.indent()
 				p.writeValue(val.Index(i), false)
-				fmt.Fprint(p.tw, ",\n")
+				fmt.Fprint(p.tw, delimiter)
+				fmt.Fprint(p.tw, newLine)
 			}
 			p.depth--
 		}

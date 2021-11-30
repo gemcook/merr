@@ -14,6 +14,7 @@ bootstrap-golangci:
 lint:
 	@if [ ! -e bin/golangci-lint ]; then $(MAKE) bootstrap-golangci ; fi
 	bin/golangci-lint run ./...
+
 .PHONY: clean
 clean:
 	rm -rf ./bin

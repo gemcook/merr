@@ -30,8 +30,6 @@ var (
 	delimiter string = ","
 )
 
-type formatterFunc func(e *errs) string
-
 var formatter = func(e *errs) string {
 	var result string
 	suffix := newLine

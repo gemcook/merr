@@ -21,6 +21,20 @@ go get -u github.com/gemcook/merr
 import "github.com/gemcook/merr"
 ```
 
+### Determine if it's an error
+
+```go
+multiError := merr.New()
+
+// do something...
+
+// error handling example
+if multiError.ErrorOrNil() != nil {
+    return multiError
+}
+return nil
+```
+
 ### Appends error
 
 Appends error to list of errors.
@@ -53,7 +67,7 @@ for i := 0; i < 10; i++ {
 fmt.Println(multiError.Error())
 ```
 
-```
+```text
 "something error",
 "something error",
   .
@@ -79,7 +93,7 @@ for i := 0; i < 10; i++ {
 multiError.PrettyPrint()
 ```
 
-```
+```text
 Errors[
   &errors.errorString{
     s: "something error",

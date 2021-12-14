@@ -10,6 +10,10 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+type somethingError struct{}
+
+func (s *somethingError) Error() string { return "something error" }
+
 func Test_errs_Error(t *testing.T) {
 	tests := []struct {
 		name string
@@ -173,10 +177,6 @@ func Test_errs_As(t *testing.T) {
 	}
 }
 
-type somethingError struct{}
-
-func (s *somethingError) Error() string { return "something error" }
-
 func Test_errs_PrettyPrint(t *testing.T) {
 	tests := []struct {
 		name string
@@ -263,6 +263,46 @@ func TestSetNewLine(t *testing.T) {
 			e.PrettyPrint()
 
 			assert.Equal(t, tt.want, buf.String())
+		})
+	}
+}
+
+func Test_errs_ErrorOrNil(t *testing.T) {
+	tests := []struct {
+		name    string
+		errs    []error
+		wantErr bool
+	}{
+		{
+			"an error",
+			[]error{
+				&somethingError{},
+			},
+			true,
+		},
+		{
+			"no error",
+			[]error{},
+			false,
+		},
+		{
+			"nil only",
+			[]error{nil},
+			false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := New()
+			for _, e := range tt.errs {
+				err.Append(e)
+			}
+
+			if tt.wantErr {
+				assert.Error(t, err.ErrorOrNil())
+			} else {
+				assert.NoError(t, err.ErrorOrNil())
+			}
 		})
 	}
 }

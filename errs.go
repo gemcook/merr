@@ -69,6 +69,7 @@ func SetNewLine(n string) {
 type Errs interface {
 	Append(err error)
 	Error() string
+	ErrorOrNil() error
 	Is(target error) bool
 	As(target interface{}) bool
 	PrettyPrint()
@@ -90,7 +91,30 @@ func (e *errs) Error() string {
 	return formatter(e)
 }
 
+func (e *errs) ErrorOrNil() error {
+	if e == nil {
+		return nil
+	}
+
+	if len(e.Errors) == 0 {
+		return nil
+	}
+
+	// If only nil is contained in the array,
+	// it is not considered an error.
+	for _, err := range e.Errors {
+		if err != nil {
+			return e
+		}
+	}
+
+	return nil
+}
+
 func (e *errs) Append(err error) {
+	if e == nil {
+		return
+	}
 	e.mx.Lock()
 	defer e.mx.Unlock()
 	if e.Errors == nil {
@@ -100,6 +124,9 @@ func (e *errs) Append(err error) {
 }
 
 func (e *errs) Is(target error) bool {
+	if e == nil {
+		return false
+	}
 	for _, err := range e.Errors {
 		if errors.Is(err, target) {
 			return true
@@ -109,6 +136,9 @@ func (e *errs) Is(target error) bool {
 }
 
 func (e *errs) As(target interface{}) bool {
+	if e == nil {
+		return false
+	}
 	for _, err := range e.Errors {
 		if errors.As(err, target) {
 			return true
@@ -118,6 +148,12 @@ func (e *errs) As(target interface{}) bool {
 }
 
 func (e *errs) PrettyPrint() {
+	if e == nil {
+		e = &errs{
+			mx:     sync.Mutex{},
+			Errors: nil,
+		}
+	}
 	fmt.Fprint(output, e.prettyFormat())
 }
 

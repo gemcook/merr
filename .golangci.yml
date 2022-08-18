@@ -18,7 +18,6 @@ linters:
     - gomnd
     - gosec
     - govet
-    - ifshort
     - makezero
     - misspell
     - nolintlint
